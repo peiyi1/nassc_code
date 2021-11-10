@@ -69,20 +69,16 @@ with open(resultfile, 'w') as csvfile:
     circuit = suite.circuits()
     result = Result(circuit, basis_gates=basis_gates, coupling_map=coupling_map, routing_method="sabre",shots=shots, noise_model=noise_model)
     result.run_pms(passmanagers, times=times)
-    print(result.row(fields))
     writer.writerow(result.row(fields))
 
     result = Result(circuit, basis_gates=basis_gates, coupling_map=coupling_map, routing_method="NASSCSwap",shots=shots, noise_model=noise_model)
     result.run_pms(passmanagers, times=times)
-    print(result.row(fields))
     writer.writerow(result.row(fields))
 
     result = Result(circuit, basis_gates=basis_gates, coupling_map=coupling_map, routing_method="sabre_noise",shots=shots, noise_model=noise_model, hardware= IBMQHardwareArchitecture(hardware))
     result.run_pms(passmanagers, times=times)
-    print(result.row(fields))
     writer.writerow(result.row(fields))
 
     result = Result(circuit, basis_gates=basis_gates, coupling_map=coupling_map, routing_method="NASSCSwapConsiderNoise",shots=shots, noise_model=noise_model, hardware= IBMQHardwareArchitecture(hardware))
     result.run_pms(passmanagers, times=times)
-    print(result.row(fields))
     writer.writerow(result.row(fields))
