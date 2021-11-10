@@ -1,0 +1,12 @@
+suite: benchmark.suites.bv_n19
+backend: qiskit.test.mock:FakeMontreal
+times: 10
+pass managers:
+  - qiskit.transpiler.preset_passmanagers:level_3_pass_manager
+fields:
+  - routing_method
+  - n_qubits
+  - depth
+  - level3_cxs
+  - level3_depth
+  - level3_time
