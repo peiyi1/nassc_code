@@ -9,6 +9,8 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
+#
+# notice: the original code is from Qiskit and has been modified by Peiyi Li
 
 """Circuit transpile function"""
 import logging
@@ -60,6 +62,12 @@ def transpile(
     approximation_degree: Optional[float] = None,
     timing_constraints: Optional[Dict[str, int]] = None,
     seed_transpiler: Optional[int] = None,
+    factor_block: Optional[int] = None, #pli11
+    factor_commute_0: Optional[int] = None, #pli11
+    factor_commute_1: Optional[int] = None, #pli11
+    enable_factor_block: Optional[bool] = None, #pli11
+    enable_factor_commute_0: Optional[bool] = None, #pli11
+    enable_factor_commute_1: Optional[bool] = None, #pli11
     optimization_level: Optional[int] = None,
     pass_manager: Optional[PassManager] = None,
     callback: Optional[Callable[[BasePass, DAGCircuit, float, PropertySet, int], Any]] = None,
@@ -235,6 +243,12 @@ def transpile(
             basis_gates=basis_gates,
             coupling_map=coupling_map,
             seed_transpiler=seed_transpiler,
+            factor_block=factor_block, #pli11
+            factor_commute_0=factor_commute_0, #pli11
+            factor_commute_1=factor_commute_1, #pli11
+            enable_factor_block = enable_factor_block, #pli11
+            enable_factor_commute_0 = enable_factor_commute_0, #pli11
+            enable_factor_commute_1 = enable_factor_commute_1, #pli11
             backend_properties=backend_properties,
             initial_layout=initial_layout,
             layout_method=layout_method,
@@ -281,6 +295,12 @@ def transpile(
         dt,
         approximation_degree,
         seed_transpiler,
+        factor_block, #pli11
+        factor_commute_0, #pli11
+        factor_commute_1, #pli11
+        enable_factor_block, #pli11
+        enable_factor_commute_0, #pli11
+        enable_factor_commute_1, #pli11
         optimization_level,
         callback,
         output_name,
@@ -462,6 +482,12 @@ def _parse_transpile_args(
     dt,
     approximation_degree,
     seed_transpiler,
+    factor_block, #pli11
+    factor_commute_0, #pli11
+    factor_commute_1, #pli11
+    enable_factor_block, #pli11
+    enable_factor_commute_0, #pli11
+    enable_factor_commute_1, #pli11
     optimization_level,
     callback,
     output_name,
@@ -498,6 +524,12 @@ def _parse_transpile_args(
     translation_method = _parse_translation_method(translation_method, num_circuits)
     approximation_degree = _parse_approximation_degree(approximation_degree, num_circuits)
     seed_transpiler = _parse_seed_transpiler(seed_transpiler, num_circuits)
+    factor_block = _parse_factor_block(factor_block, num_circuits) #pli11
+    factor_commute_0 = _parse_factor_commute_0(factor_commute_0, num_circuits) #pli11
+    factor_commute_1 = _parse_factor_commute_1(factor_commute_1, num_circuits) #pli11
+    enable_factor_block = _parse_enable_factor_block(enable_factor_block, num_circuits) #pli11
+    enable_factor_commute_0 = _parse_enable_factor_commute_0(enable_factor_commute_0, num_circuits) #pli11
+    enable_factor_commute_1 = _parse_enable_factor_commute_1(enable_factor_commute_1, num_circuits) #pli11
     optimization_level = _parse_optimization_level(optimization_level, num_circuits)
     output_name = _parse_output_name(output_name, circuits)
     callback = _parse_callback(callback, num_circuits)
@@ -525,6 +557,12 @@ def _parse_transpile_args(
             "approximation_degree": approximation_degree,
             "timing_constraints": timing_constraints,
             "seed_transpiler": seed_transpiler,
+            "factor_block": factor_block, #pli11
+            "factor_commute_0": factor_commute_0, #pli11
+            "factor_commute_1": factor_commute_1, #pli11
+            "enable_factor_block": enable_factor_block, #pli11
+            "enable_factor_commute_0": enable_factor_commute_0, #pli11
+            "enable_factor_commute_1": enable_factor_commute_1, #pli11
             "optimization_level": optimization_level,
             "output_name": output_name,
             "callback": callback,
@@ -546,6 +584,12 @@ def _parse_transpile_args(
                 approximation_degree=kwargs["approximation_degree"],
                 timing_constraints=kwargs["timing_constraints"],
                 seed_transpiler=kwargs["seed_transpiler"],
+                factor_block=kwargs["factor_block"], #pli11
+                factor_commute_0=kwargs["factor_commute_0"], #pli11
+                factor_commute_1=kwargs["factor_commute_1"], #pli11
+                enable_factor_block=kwargs["enable_factor_block"], #pli11
+                enable_factor_commute_0=kwargs["enable_factor_commute_0"], #pli11
+                enable_factor_commute_1=kwargs["enable_factor_commute_1"], #pli11
             ),
             "optimization_level": kwargs["optimization_level"],
             "output_name": kwargs["output_name"],
@@ -797,6 +841,35 @@ def _parse_seed_transpiler(seed_transpiler, num_circuits):
         seed_transpiler = [seed_transpiler] * num_circuits
     return seed_transpiler
 
+def _parse_factor_block(factor_block, num_circuits):
+    if not isinstance(factor_block, list):
+        factor_block = [factor_block] * num_circuits
+    return factor_block
+
+def _parse_factor_commute_0(factor_commute_0, num_circuits):
+    if not isinstance(factor_commute_0, list):
+        factor_commute_0 = [factor_commute_0] * num_circuits
+    return factor_commute_0
+
+def _parse_factor_commute_1(factor_commute_1, num_circuits):
+    if not isinstance(factor_commute_1, list):
+        factor_commute_1 = [factor_commute_1] * num_circuits
+    return factor_commute_1
+
+def _parse_enable_factor_block(enable_factor_block, num_circuits):
+    if not isinstance(enable_factor_block, list):
+        enable_factor_block = [enable_factor_block] * num_circuits
+    return enable_factor_block
+
+def _parse_enable_factor_commute_0(enable_factor_commute_0, num_circuits):
+    if not isinstance(enable_factor_commute_0, list):
+        enable_factor_commute_0 = [enable_factor_commute_0] * num_circuits
+    return enable_factor_commute_0
+
+def _parse_enable_factor_commute_1(enable_factor_commute_1, num_circuits):
+    if not isinstance(enable_factor_commute_1, list):
+        enable_factor_commute_1 = [enable_factor_commute_1] * num_circuits
+    return enable_factor_commute_1
 
 def _parse_optimization_level(optimization_level, num_circuits):
     if not isinstance(optimization_level, list):

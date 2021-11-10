@@ -10,6 +10,8 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
+#notice: the original code is from Qiskit and has been modified by Peiyi Li
+
 # pylint: disable=redefined-builtin
 
 """Objects to represent the information at a node in the DAGCircuit."""
@@ -320,9 +322,9 @@ class DAGNode:
 class DAGOpNode(DAGNode):
     """Object to represent an Instruction at a node in the DAGCircuit."""
 
-    __slots__ = ["_type", "op", "qargs", "cargs", "sort_key"]
+    __slots__ = ["_type", "op", "qargs", "cargs", "sort_key", "inserted_swap"]
 
-    def __init__(self, op, qargs=None, cargs=None):
+    def __init__(self, op, qargs=None, cargs=None, inserted_swap=False):
         """Create an Instruction node"""
         super().__init__()
         self._type = "op"  # Remove when DAGNode.type is removed
@@ -330,7 +332,7 @@ class DAGOpNode(DAGNode):
         self.qargs = qargs
         self.cargs = cargs
         self.sort_key = str(self.qargs)
-
+        self.inserted_swap = inserted_swap
     @property
     def name(self):
         """Returns the Instruction name corresponding to the op for this node"""
@@ -341,7 +343,10 @@ class DAGOpNode(DAGNode):
         """Sets the Instruction name corresponding to the op for this node"""
         self.op.name = new_name
 
-
+    #pli11: add this is_inserted_swap to check if there is an inserted swap
+    def is_inserted_swap(self):
+        return self.inserted_swap
+        
 class DAGInNode(DAGNode):
     """Object to represent an incoming wire node in the DAGCircuit."""
 

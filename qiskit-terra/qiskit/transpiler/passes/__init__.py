@@ -9,7 +9,8 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
-
+#
+# notice: the original code is from Qiskit and has been modified by Peiyi Li
 """
 ===================================================
 Transpiler Passes (:mod:`qiskit.transpiler.passes`)
@@ -151,7 +152,9 @@ from .routing import LookaheadSwap
 from .routing import StochasticSwap
 from .routing import SabreSwap
 from .routing import BIPMapping
-
+from .routing import NASSCSwap #pli11
+from .routing import SabreSwapConsiderNoise
+from .routing import NASSCSwapConsiderNoise
 # basis change
 from .basis import Decompose
 from .basis import Unroller

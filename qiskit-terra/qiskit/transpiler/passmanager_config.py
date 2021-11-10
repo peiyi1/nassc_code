@@ -9,7 +9,8 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
-
+#
+# notice: the original code is from Qiskit and has been modified by Peiyi Li
 """Pass Manager Configuration class."""
 
 
@@ -30,6 +31,13 @@ class PassManagerConfig:
         approximation_degree=None,
         seed_transpiler=None,
         timing_constraints=None,
+        factor_block=None, #pli11
+        factor_commute_0=None, #pli11
+        factor_commute_1=None, #pli11
+        enable_factor_block=None, #pli11
+        enable_factor_commute_0=None, #pli11
+        enable_factor_commute_1=None, #pli11
+        hardware = None, #pli11
     ):
         """Initialize a PassManagerConfig object
 
@@ -69,3 +77,11 @@ class PassManagerConfig:
         self.approximation_degree = approximation_degree
         self.seed_transpiler = seed_transpiler
         self.timing_constraints = timing_constraints
+        #pli11
+        self.factor_block = factor_block
+        self.factor_commute_0 = factor_commute_0
+        self.factor_commute_1 = factor_commute_1
+        self.enable_factor_block = enable_factor_block
+        self.enable_factor_commute_0 = enable_factor_commute_0
+        self.enable_factor_commute_1 = enable_factor_commute_1
+        self.hardware = hardware

@@ -9,6 +9,8 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
+#
+#notice: the original code is from Qiskit and has been modified by Peiyi Li
 
 """Pass manager for optimization level 3, providing heavy optimization.
 
@@ -38,6 +40,9 @@ from qiskit.transpiler.passes import BasicSwap
 from qiskit.transpiler.passes import LookaheadSwap
 from qiskit.transpiler.passes import StochasticSwap
 from qiskit.transpiler.passes import SabreSwap
+from qiskit.transpiler.passes import NASSCSwap #pli11
+from qiskit.transpiler.passes import SabreSwapConsiderNoise #pli11
+from qiskit.transpiler.passes import NASSCSwapConsiderNoise #pli11
 from qiskit.transpiler.passes import FullAncillaAllocation
 from qiskit.transpiler.passes import EnlargeWithAncilla
 from qiskit.transpiler.passes import FixedPoint
@@ -62,6 +67,10 @@ from qiskit.transpiler.passes import Error
 
 from qiskit.transpiler import TranspilerError
 
+from qiskit.quantum_info.synthesis import one_qubit_decompose #pli11
+from qiskit.quantum_info.synthesis.two_qubit_decompose import TwoQubitBasisDecomposer #pli11
+from qiskit.circuit.library.standard_gates import iSwapGate, CXGate, CZGate, RXXGate, ECRGate #pli11
+from math import pi #pli11
 
 def level_3_pass_manager(pass_manager_config: PassManagerConfig) -> PassManager:
     """Level 3 pass manager: heavy optimization by noise adaptive qubit mapping and
@@ -103,6 +112,14 @@ def level_3_pass_manager(pass_manager_config: PassManagerConfig) -> PassManager:
     approximation_degree = pass_manager_config.approximation_degree
     timing_constraints = pass_manager_config.timing_constraints or TimingConstraints()
 
+    #pli11
+    factor_block = pass_manager_config.factor_block
+    factor_commute_0 = pass_manager_config.factor_commute_0
+    factor_commute_1 = pass_manager_config.factor_commute_1
+    enable_factor_block = pass_manager_config.enable_factor_block
+    enable_factor_commute_0 = pass_manager_config.enable_factor_commute_0
+    enable_factor_commute_1 = pass_manager_config.enable_factor_commute_1
+    hardware = pass_manager_config.hardware
     # 1. Unroll to 1q or 2q gates
     _unroll3q = Unroll3qOrMore()
 
@@ -168,6 +185,35 @@ def level_3_pass_manager(pass_manager_config: PassManagerConfig) -> PassManager:
     # 3. Extend dag/layout with ancillas using the full coupling map
     _embed = [FullAncillaAllocation(coupling_map), EnlargeWithAncilla(), ApplyLayout()]
 
+    #pli11
+    def _choose_kak_gate(basis_gates):
+        """Choose the first available 2q gate to use in the KAK decomposition."""
+
+        kak_gate_names = {
+            "cx": CXGate(),
+            "cz": CZGate(),
+            "iswap": iSwapGate(),
+            "rxx": RXXGate(pi / 2),
+            "ecr": ECRGate(),
+        }
+
+        kak_gate = None
+        kak_gates = set(basis_gates or []).intersection(kak_gate_names.keys())
+        if kak_gates:
+            kak_gate = kak_gate_names[kak_gates.pop()]
+
+        return kak_gate
+    #pli11
+    def _choose_euler_basis(basis_gates):
+        """ "Choose the first available 1q basis to use in the Euler decomposition."""
+        basis_set = set(basis_gates or [])
+
+        for basis, gates in one_qubit_decompose.ONE_QUBIT_EULER_BASIS_GATES.items():
+            if set(gates).issubset(basis_set):
+                return basis
+
+        return None
+    
     # 4. Swap to fit the coupling map
     _swap_check = CheckMap(coupling_map)
 
@@ -183,6 +229,20 @@ def level_3_pass_manager(pass_manager_config: PassManagerConfig) -> PassManager:
         _swap += [LookaheadSwap(coupling_map, search_depth=5, search_width=6)]
     elif routing_method == "sabre":
         _swap += [SabreSwap(coupling_map, heuristic="decay", seed=seed_transpiler)]
+    #pli11
+    elif routing_method == "NASSCSwap":
+        euler_basis = _choose_euler_basis(basis_gates)
+        kak_gate = _choose_kak_gate(basis_gates)
+        decomposer2q = TwoQubitBasisDecomposer(kak_gate, euler_basis=euler_basis)
+        _swap += [NASSCSwap(coupling_map, heuristic="decay", seed=seed_transpiler, enable_factor_block=enable_factor_block, enable_factor_commute_0=enable_factor_commute_0, enable_factor_commute_1=enable_factor_commute_1, factor_block=factor_block, factor_commute_0=factor_commute_0, factor_commute_1=factor_commute_1, decomposer2q = decomposer2q, approximation_degree=approximation_degree)]
+    elif routing_method == "sabre_noise":
+        _swap += [SabreSwapConsiderNoise(coupling_map, heuristic="decay", seed=seed_transpiler,  hardware=hardware)]
+    elif routing_method == "NASSCSwapConsiderNoise":
+        euler_basis = _choose_euler_basis(basis_gates)
+        kak_gate = _choose_kak_gate(basis_gates)
+        decomposer2q = TwoQubitBasisDecomposer(kak_gate, euler_basis=euler_basis)
+        _swap += [NASSCSwapConsiderNoise(coupling_map, heuristic="decay", seed=seed_transpiler, enable_factor_block=enable_factor_block, enable_factor_commute_0=enable_factor_commute_0, enable_factor_commute_1=enable_factor_commute_1, factor_block=factor_block, factor_commute_0=factor_commute_0, factor_commute_1=factor_commute_1, decomposer2q = decomposer2q, approximation_degree=approximation_degree, hardware=hardware)]
+    #
     elif routing_method == "none":
         _swap += [
             Error(
@@ -267,6 +327,18 @@ def level_3_pass_manager(pass_manager_config: PassManagerConfig) -> PassManager:
         AlignMeasures(alignment=timing_constraints.acquire_alignment),
     ]
 
+    _opt_before_routing = [
+        Collect2qBlocks(),
+        ConsolidateBlocks(basis_gates=basis_gates),
+        UnitarySynthesis(
+            basis_gates,
+            approximation_degree=approximation_degree,
+            coupling_map=coupling_map,
+            backend_props=backend_properties,
+        ),
+        Optimize1qGatesDecomposition(basis_gates),
+    ]
+    
     # Build pass manager
     pm3 = PassManager()
     pm3.append(_unroll3q)
@@ -278,8 +350,12 @@ def level_3_pass_manager(pass_manager_config: PassManagerConfig) -> PassManager:
         pm3.append(_choose_layout_2, condition=_csp_not_found_match)
         pm3.append(_embed)
         pm3.append(_swap_check)
+        if routing_method == "NASSCSwap":
+            pm3.append(_unroll+_opt_before_routing)
         pm3.append(_swap, condition=_swap_condition)
     pm3.append(_unroll)
+    if routing_method == "NASSCSwap":
+        pm3.append([CommutativeCancellation()]) #pli11: add CommutativeCancellation to better use the nassc routings
     if coupling_map and not coupling_map.is_symmetric:
         pm3.append(_direction_check)
         pm3.append(_direction, condition=_direction_condition)

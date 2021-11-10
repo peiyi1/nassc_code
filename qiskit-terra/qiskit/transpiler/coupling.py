@@ -9,7 +9,8 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
-
+#
+# notice: the original code is from Qiskit and has been modified by Peiyi Li
 """
 Directed graph object for representing coupling between physical qubits.
 
@@ -29,7 +30,7 @@ import retworkx as rx
 
 from qiskit.transpiler.exceptions import CouplingError
 from qiskit.exceptions import MissingOptionalLibraryError
-
+from hamap import *
 
 class CouplingMap:
     """
@@ -53,6 +54,11 @@ class CouplingMap:
         self.graph = rx.PyDiGraph()
         # a dict of dicts from node pairs to distances
         self._dist_matrix = None
+        self._dist_matrix_consider_noise = None
+        self._dist_matrix_error_cost = None
+        self.norm_swap_number = None
+        self.norm_execution_time = None
+        self.norm_error_cost = None
         # a sorted list of physical qubits (integers) in this coupling map
         self._qubit_list = None
         # number of qubits in the graph
@@ -94,6 +100,8 @@ class CouplingMap:
             )
         self.graph.add_node(physical_qubit)
         self._dist_matrix = None  # invalidate
+        self._dist_matrix_consider_noise = None
+        self._dist_matrix_error_cost = None
         self._qubit_list = None  # invalidate
         self._size = None  # invalidate
 
@@ -110,6 +118,8 @@ class CouplingMap:
             self.add_physical_qubit(dst)
         self.graph.add_edge(src, dst, None)
         self._dist_matrix = None  # invalidate
+        self._dist_matrix_consider_noise = None
+        self._dist_matrix_error_cost = None
         self._is_symmetric = None  # invalidate
 
     def subgraph(self, nodelist):
@@ -170,7 +180,6 @@ class CouplingMap:
         if not self.is_connected():
             raise CouplingError("coupling graph not connected")
         self._dist_matrix = rx.digraph_distance_matrix(self.graph, as_undirected=True)
-
     def distance(self, physical_qubit1, physical_qubit2):
         """Returns the undirected distance between physical_qubit1 and physical_qubit2.
 
@@ -191,7 +200,49 @@ class CouplingMap:
         if self._dist_matrix is None:
             self._compute_distance_matrix()
         return int(self._dist_matrix[physical_qubit1, physical_qubit2])
-
+    
+    #pli11: compute distance_matrix consider noise
+    def _compute_distance_matrix_consider_noise(self,hardware):
+        if not self.is_connected():
+            raise CouplingError("coupling graph not connected")
+        self._dist_matrix_consider_noise = get_distance_matrix_swap_number_and_error(hardware)
+        #pli11: compute the norm value
+        distance_matrix_swap_number = get_distance_matrix_swap_number(hardware )
+        self.norm_swap_number = np.linalg.norm(distance_matrix_swap_number)
+        
+        distance_matrix_execution_time = get_distance_matrix_execution_time_cost(hardware )
+        self.norm_execution_time = np.linalg.norm(distance_matrix_execution_time)
+        
+        distance_matrix_error_cost = get_distance_matrix_error_cost(hardware )
+        self.norm_error_cost = np.linalg.norm(distance_matrix_error_cost)
+    def obtain_norm_swap_number(self):
+        return self.norm_swap_number
+    def obtain_norm_execution_time(self):
+        return self.norm_execution_time
+    def obtain_norm_error_cost(self):
+        return self.norm_error_cost
+    def distance_consider_noise(self, physical_qubit1, physical_qubit2, hardware):
+        if physical_qubit1 >= self.size():
+            raise CouplingError("%s not in coupling graph" % physical_qubit1)
+        if physical_qubit2 >= self.size():
+            raise CouplingError("%s not in coupling graph" % physical_qubit2)
+        if self._dist_matrix_consider_noise is None:
+            self._compute_distance_matrix_consider_noise(hardware)
+        return int(self._dist_matrix_consider_noise[physical_qubit1, physical_qubit2])
+    #pli11: compute distance_matrix_error_cost
+    def _compute_distance_matrix_error_cost(self,hardware):
+        if not self.is_connected():
+            raise CouplingError("coupling graph not connected")
+        self._dist_matrix_error_cost = get_distance_matrix_error_cost(hardware)
+    def distance_error_cost(self, physical_qubit1, physical_qubit2,hardware):
+        if physical_qubit1 >= self.size():
+            raise CouplingError("%s not in coupling graph" % physical_qubit1)
+        if physical_qubit2 >= self.size():
+            raise CouplingError("%s not in coupling graph" % physical_qubit2)
+        if self._dist_matrix_error_cost is None:
+            self._compute_distance_matrix_error_cost(hardware)
+        return int(self._dist_matrix_error_cost[physical_qubit1, physical_qubit2])
+    
     def shortest_undirected_path(self, physical_qubit1, physical_qubit2):
         """Returns the shortest undirected path between physical_qubit1 and physical_qubit2.
 
@@ -232,6 +283,8 @@ class CouplingMap:
             if (dest, src) not in edges:
                 self.add_edge(dest, src)
         self._dist_matrix = None  # invalidate
+        self._dist_matrix_consider_noise = None
+        self._dist_matrix_error_cost = None
         self._is_symmetric = None  # invalidate
 
     def _check_symmetry(self):

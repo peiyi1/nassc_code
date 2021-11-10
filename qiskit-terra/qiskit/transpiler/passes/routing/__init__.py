@@ -9,7 +9,8 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
-
+#
+# notice: the original code is from Qiskit and has been modified by Peiyi Li
 """Module containing transpiler mapping passes."""
 
 from .basic_swap import BasicSwap
@@ -18,3 +19,6 @@ from .lookahead_swap import LookaheadSwap
 from .stochastic_swap import StochasticSwap
 from .sabre_swap import SabreSwap
 from .bip_mapping import BIPMapping
+from .nassc_swap import NASSCSwap
+from .sabre_swap_consider_noise import SabreSwapConsiderNoise
+from .nassc_swap_consider_noise import NASSCSwapConsiderNoise

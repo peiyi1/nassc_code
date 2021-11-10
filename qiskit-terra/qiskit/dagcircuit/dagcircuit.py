@@ -9,7 +9,8 @@
 # Any modifications or derivative works of this code must retain this
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
-
+#
+# notice: the original code is from Qiskit and has been modified by Peiyi Li
 """
 Object to represent a quantum circuit as a directed acyclic graph (DAG).
 
@@ -374,7 +375,7 @@ class DAGCircuit:
         else:
             raise CircuitError("Condition must be used with ClassicalRegister or Clbit.")
 
-    def _add_op_node(self, op, qargs, cargs):
+    def _add_op_node(self, op, qargs, cargs, inserted_swap=False):
         """Add a new operation node to the graph and assign properties.
 
         Args:
@@ -385,7 +386,7 @@ class DAGCircuit:
             int: The integer node index for the new op node on the DAG
         """
         # Add a new operation node to the graph
-        new_node = DAGOpNode(op=op, qargs=qargs, cargs=cargs)
+        new_node = DAGOpNode(op=op, qargs=qargs, cargs=cargs, inserted_swap=inserted_swap)
         node_index = self._multi_graph.add_node(new_node)
         new_node._node_id = node_index
         return node_index
@@ -409,7 +410,7 @@ class DAGCircuit:
 
         return target_dag
 
-    def apply_operation_back(self, op, qargs=None, cargs=None):
+    def apply_operation_back(self, op, qargs=None, cargs=None, inserted_swap=False):
         """Apply an operation to the output of the circuit.
 
         Args:
@@ -433,7 +434,7 @@ class DAGCircuit:
         self._check_bits(qargs, self.output_map)
         self._check_bits(all_cbits, self.output_map)
 
-        node_index = self._add_op_node(op, qargs, cargs)
+        node_index = self._add_op_node(op, qargs, cargs, inserted_swap)
 
         # Add new in-edges from predecessors of the output nodes to the
         # operation node while deleting the old in-edges of the output nodes
