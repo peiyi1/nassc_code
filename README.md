@@ -1,3 +1,4 @@
+[![DOI](https://zenodo.org/badge/426498854.svg)](https://zenodo.org/badge/latestdoi/426498854)
 # Optimization-Aware Qubit Routing: NASSC
 This repository contains the implementation of Optimization-Aware Qubit Routing: NASSC
 
