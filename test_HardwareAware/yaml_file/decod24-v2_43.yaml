@@ -1,0 +1,13 @@
+suite: benchmark.suites.decod24-v2_43
+provider: ibm-q-ncsu.nc-state.ece792
+hardware: ibmq_montreal
+times: 10
+shots: 8192
+pass managers:
+  - qiskit.transpiler.preset_passmanagers:level_3_pass_manager
+fields:
+  - routing_method
+  - n_qubits
+  - level3_cxs
+  - successful_rate
+  - level3_depth  
