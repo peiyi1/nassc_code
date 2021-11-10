@@ -128,5 +128,6 @@ ax.legend()
 
 fig.tight_layout()
 plt.xticks(x, labels, rotation=45)
-plt.savefig('fidelity_compare.pdf')
+plt.savefig('fidelity_compare.pdf',bbox_inches = 'tight')
+
 
