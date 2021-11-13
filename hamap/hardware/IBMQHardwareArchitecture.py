@@ -314,18 +314,12 @@ class IBMQHardwareArchitecture(HardwareArchitecture):
             exit(1)
 
     def save(self, hardware_name: str):
-        filepath = (
-            f"{hardware_name}.archdata"
-        )
-        with open(str(filepath), "wb") as f:
-            logger.info(f"Saving IBMQHardwareArchitecture instance in '{filepath}'.")
+        with open("montreal.archdata", "wb") as f:
+            logger.info(f"Saving IBMQHardwareArchitecture instance.")
             pickle.dump(self, f)
 
     @staticmethod
     def load(hardware_name: str) -> "IBMQHardwareArchitecture":
-        filepath = (
-            f"{hardware_name}.archdata"
-        )
-        with open(str(filepath), "rb") as f:
-            logger.info(f"Loading IBMQHardwareArchitecture instance from '{filepath}'.")
+        with open("montreal.archdata", "rb") as f:
+            logger.info(f"Loading IBMQHardwareArchitecture instance.")
             return pickle.load(f)
