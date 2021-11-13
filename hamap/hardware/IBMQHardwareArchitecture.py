@@ -42,7 +42,7 @@ from qiskit.circuit.quantumregister import Qubit
 from qiskit.dagcircuit.dagcircuit import DAGNode
 
 from .HardwareArchitecture import HardwareArchitecture
-
+from pathlib import Path
 logger = logging.getLogger("hamap.IBMQHardwareArchitecture")
 
 
@@ -314,12 +314,18 @@ class IBMQHardwareArchitecture(HardwareArchitecture):
             exit(1)
 
     def save(self, hardware_name: str):
-        with open("montreal.archdata", "wb") as f:
+        filepath = (
+            Path(".")/ f"{hardware_name}.archdata"
+        )
+        with open(str(filepath), "wb") as f:
             logger.info(f"Saving IBMQHardwareArchitecture instance.")
             pickle.dump(self, f)
 
     @staticmethod
     def load(hardware_name: str) -> "IBMQHardwareArchitecture":
-        with open("montreal.archdata", "rb") as f:
+        filepath = (
+            Path(".")/ f"{hardware_name}.archdata"
+        )
+        with open(str(filepath), "rb") as f:
             logger.info(f"Loading IBMQHardwareArchitecture instance.")
             return pickle.load(f)
