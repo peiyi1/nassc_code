@@ -47,10 +47,10 @@ for pm_line in configuration['pass managers']:
 #hardware.save("ibmq_montreal")
 
 hardware=IBMQHardwareArchitecture.load("ibmq_montreal")
-backend = IBMQHardwareArchitecture._get_backend("ibmq_montreal")
-noise_model = NoiseModel.from_backend(backend)
+from qiskit.test.mock import FakeMontreal
+noise_model = NoiseModel.from_backend(FakeMontreal())
 basis_gates = noise_model.basis_gates
-coupling_map = CouplingMap(backend.configuration().coupling_map)
+coupling_map = CouplingMap(FakeMontreal().configuration().coupling_map)
 
 shots=configuration['shots']
 
