@@ -42,8 +42,8 @@ for pm_line in configuration['pass managers']:
     passmanagers.append(getattr(import_module(pm_module), pm_func))
 
 coupling_map = CouplingMap.from_full(25)
-hardware=IBMQHardwareArchitecture("ibmq_montreal")
-hardware.save("ibmq_montreal")
+#hardware=IBMQHardwareArchitecture("ibmq_montreal")
+#hardware.save("ibmq_montreal")
 hardware=IBMQHardwareArchitecture.load("ibmq_montreal")
 backend = IBMQHardwareArchitecture._get_backend("ibmq_montreal")
 basis_gates = backend.configuration().basis_gates
