@@ -52,28 +52,24 @@ def obtain_data_montreal_map(csv_file):
         dict_data_sabre={}
         dict_data_sabre['num_qubits']=first_row[1]
         dict_data_sabre['num_cnot']=int(mean_data(first_row[2]))
-        dict_data_sabre['fidelity']=mean_data(first_row[3])
         dict_data_sabre['depth']=int(mean_data(first_row[4]))
         #get the result of nassc
         second_row= next(reader)
         dict_data_nassc={}
         dict_data_nassc['num_qubits']=second_row[1]
         dict_data_nassc['num_cnot']=int(mean_data(second_row[2]))
-        dict_data_nassc['fidelity']=mean_data(second_row[3])
         dict_data_nassc['depth']=int(mean_data(second_row[4]))
         #get the result of sabre_HardwareAware
         third_row= next(reader)
         dict_data_sabre_HardwareAware={}
         dict_data_sabre_HardwareAware['num_qubits']=third_row[1]
         dict_data_sabre_HardwareAware['num_cnot']=int(mean_data(third_row[2]))
-        dict_data_sabre_HardwareAware['fidelity']=mean_data(third_row[3])
         dict_data_sabre_HardwareAware['depth']=int(mean_data(third_row[4]))
         #get the result of nassc_HardwareAware
         fouth_row= next(reader)
         dict_data_nassc_HardwareAware={}
         dict_data_nassc_HardwareAware['num_qubits']=fouth_row[1]
         dict_data_nassc_HardwareAware['num_cnot']=int(mean_data(fouth_row[2]))
-        dict_data_nassc_HardwareAware['fidelity']=mean_data(fouth_row[3])
         dict_data_nassc_HardwareAware['depth']=int(mean_data(fouth_row[4]))
         return (dict_data_sabre,dict_data_nassc,dict_data_sabre_HardwareAware, dict_data_nassc_HardwareAware)
 
@@ -122,11 +118,11 @@ x = np.arange(len(labels))
 width = 0.6 
 
 fig, ax = plt.subplots()
-rects0 = ax.bar(x , num_cnot_add_sabre, width/4, label='sabre',color='tab:blue')
-rects1 = ax.bar(x + width/4, num_cnot_add_nassc, width/4, label='nassc',color='tab:orange')
-rects2 = ax.bar(x + width/2, num_cnot_add_sabre_hardwareaware, width/4, label='sabre_HardwareAware',color='tab:gray')
-rects3 = ax.bar(x + width/4*3, num_cnot_add_nassc_hardwareaware, width/4, label='nassc_HardwareAware',color='tab:red')
-ax.set_ylabel('additional cnot')
+rects0 = ax.bar(x , num_cnot_add_sabre, width/4, label='SABRE',color='tab:blue')
+rects1 = ax.bar(x + width/4, num_cnot_add_nassc, width/4, label='NASSC',color='tab:orange')
+rects2 = ax.bar(x + width/2, num_cnot_add_sabre_hardwareaware, width/4, label='SABRE+HA',color='tab:gray')
+rects3 = ax.bar(x + width/4*3, num_cnot_add_nassc_hardwareaware, width/4, label='NASSC+HA',color='tab:red')
+ax.set_ylabel('additional CNOT gate count')
 #ax.set_title('')
 ax.set_xticks(x+width/4)
 ax.set_xticklabels(labels)
