@@ -42,7 +42,6 @@ from qiskit.circuit.quantumregister import Qubit
 from qiskit.dagcircuit.dagcircuit import DAGNode
 
 from .HardwareArchitecture import HardwareArchitecture
-from pathlib import Path
 logger = logging.getLogger("hamap.IBMQHardwareArchitecture")
 
 
@@ -52,10 +51,6 @@ def cnot_execution_time_function(vertex, hardware):
 
 
 class IBMQHardwareArchitecture(HardwareArchitecture):
-
-    _hardware_directory: Path = Path(
-        __file__
-    ).parent.parent.parent / "architectures_saved_data"
 
     @staticmethod
     def _get_value(value: float, unit: str):
