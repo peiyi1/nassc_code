@@ -79,7 +79,6 @@ for csv_file in os.listdir(csv_path_CouplingMap_montreal):
     name,csv_fomat=csv_file.split('.')
     if(len(name)):
         csv_file_set.add(name)
-print(csv_file_set)
 csv_file_dict_fully_connected_map= dict.fromkeys(csv_file_set,None)
 csv_file_dict_montreal_map= dict.fromkeys(csv_file_set,None)
 
