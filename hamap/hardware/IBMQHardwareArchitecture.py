@@ -315,7 +315,7 @@ class IBMQHardwareArchitecture(HardwareArchitecture):
 
     def save(self, hardware_name: str):
         filepath = (
-            IBMQHardwareArchitecture._hardware_directory / f"{hardware_name}.archdata"
+            f"{hardware_name}.archdata"
         )
         with open(str(filepath), "wb") as f:
             logger.info(f"Saving IBMQHardwareArchitecture instance in '{filepath}'.")
@@ -324,7 +324,7 @@ class IBMQHardwareArchitecture(HardwareArchitecture):
     @staticmethod
     def load(hardware_name: str) -> "IBMQHardwareArchitecture":
         filepath = (
-            IBMQHardwareArchitecture._hardware_directory / f"{hardware_name}.archdata"
+            f"{hardware_name}.archdata"
         )
         with open(str(filepath), "rb") as f:
             logger.info(f"Loading IBMQHardwareArchitecture instance from '{filepath}'.")
