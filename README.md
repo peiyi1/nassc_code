@@ -1,11 +1,11 @@
 [![DOI](https://zenodo.org/badge/426498854.svg)](https://zenodo.org/badge/latestdoi/426498854)
 # Optimization-Aware Qubit Routing: NASSC
-This repository contains the implementation of Optimization-Aware Qubit Routing: NASSC
+This repository contains the source code, benchmarks and scripts to reproduce experiments from the HPCA 2022 paper "Not All SWAPs Have the Same Cost: A Case for Optimization-Aware Qubit Routing" by Ji Liu, Peiyi Li, and Huiyang Zhou.
 
 # Installation
 1. Anaconda installation: 
 
-    Anaconda can be downloaded in https://www.anaconda.com/.
+    Anaconda can be downloaded in https://www.anaconda.com/
 
 2. After installing Anaconda, create an environment and activate the environment:
 
@@ -15,33 +15,31 @@ This repository contains the implementation of Optimization-Aware Qubit Routing:
     
 3. Qiskit installation:
 
-    Clone our source code from github:
+    (1). Go to the directory /nassc_code/qiskit-terra/ and install the qiskit-terra:
     
-    $ git clone https://github.com/peiyi1/nassc_code.git
+        $ pip install cython
     
-    Install the qiskit-terra:
+        $ pip install -r requirements-dev.txt
     
-    $ cd nassc_code/qiskit-terra
+        $ pip install .
     
-    $ pip install cython
+    (2). Go to the directory /nassc_code/qiskit-ibmq-provider/ and install the qiskit-ibmq-provider:
     
-    $ pip install -r requirements-dev.txt
+        $ pip install -r requirements-dev.txt
     
-    $ pip install .
-    
-    Install the qiskit-ibmq-provider:
-    
-    $ cd ../qiskit-ibmq-provider/
-    
-    $ pip install -r requirements-dev.txt
-    
-    $ pip install .
+        $ pip install .
    
-4. Install benchmark package and hamap package (the original hamap is from https://github.com/peachnuts/HA):
-
-    $ python setup_benchmark.py develop
+4. Package install:
+   
+    Go to the directory /nassc_code/ 
     
-    $ python setup_hamap.py develop
+    (1). Install benchmark package:
 
-# Run experiments
-Folder test contains scripts to run quantum benchmarks with different routing method. Script generate_raw_data.sh can be used to generate results from all the benchmark.
+        $ python setup_benchmark.py develop
+        
+    (2). Install hamap package(the original hamap is from https://github.com/peachnuts/HA):
+    
+        $ python setup_hamap.py develop
+
+# Experiments workflow
+The appendix of the HPCA 2022 paper "Not All SWAPs Have the Same Cost: A Case for Optimization-Aware Qubit Routing" contains an experiments workflow, please refer to the experiments workflow to reproduce the experiments results.
