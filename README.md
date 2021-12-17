@@ -14,8 +14,10 @@ This repository contains the source code, benchmarks and scripts to reproduce ex
     $ conda activate env
     
 3. Qiskit installation:
+    
+    After downloading our repository from Zenodo, go into the downloaded repository and install qiskit-terra and qiskit-ibmq-provider:
 
-    (1). Go to the directory /nassc_code/qiskit-terra/ and install the qiskit-terra:
+    (1). Go to the folder /qiskit-terra/ and install the qiskit-terra:
     
         $ pip install cython
     
@@ -23,15 +25,13 @@ This repository contains the source code, benchmarks and scripts to reproduce ex
     
         $ pip install .
     
-    (2). Go to the directory /nassc_code/qiskit-ibmq-provider/ and install the qiskit-ibmq-provider:
+    (2). Go to the folder /qiskit-ibmq-provider/ and install the qiskit-ibmq-provider:
     
         $ pip install -r requirements-dev.txt
     
         $ pip install .
    
-4. Package install:
-   
-    Go to the directory /nassc_code/ 
+4. Package installation:
     
     (1). Install benchmark package:
 
